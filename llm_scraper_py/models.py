@@ -168,6 +168,7 @@ class OpenAIModel:
         top_p: Optional[float] = None,
         mode: Optional[str] = None,
     ) -> Dict[str, Any]:
+        print(messages)
         client_settings = {
             "model": self._model,
             "input": messages,
@@ -241,7 +242,8 @@ class OpenAIModel:
         }
 
         try:
-            return await self._aclient.responses.parse(**client_settings).output_parsed
+            resp = await self._aclient.responses.parse(**client_settings)
+            return resp.output_parsed
         except Exception:
             # Fallback: ask for JSON in the prompt and parse
             client_settings["input"] = messages + [
@@ -250,7 +252,8 @@ class OpenAIModel:
                     "content": "Return only valid minified JSON that strictly matches the provided schema.",
                 }
             ]
-            return await self._aclient.responses.parse(**client_settings).output_parsed
+            resp = await self._aclient.responses.parse(**client_settings)
+            return resp.output_parsed
 
     async def astream_json(
         self,
@@ -387,7 +390,7 @@ async def agenerate_llm_object(
     options: Optional[ScraperLLMOptions] = None,
 ) -> Dict[str, Any]:
     opts = options or {}
-    messages = _prepare_messages(pre, opts.get("prompt"))
+    messages = _prepare_object_messages(pre, opts.get("prompt"))
 
     raw = await model.agenerate_json(
         messages=messages,
