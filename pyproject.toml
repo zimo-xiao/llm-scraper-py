@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm_scraper_py"
+version = "0.1.0"
+description = "Turn any webpage into structured data using LLMs"
+readme = "README.md"
+requires-python = ">=3.0"
+dependencies = [
+    "pydantic>=2.0",
+    "playwright>=1.4",
+    "jsonschema",
+    "nest_asyncio",
+]
+
+[tool.setuptools]
+package-dir = { "" = "." }
+
+[tool.setuptools.packages.find]
+where = ["."]

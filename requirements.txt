@@ -1,0 +1,8 @@
+pytest
+pytest-asyncio
+pydantic
+jsonschema
+playwright
+nest_asyncio
+build
+pytest-playwright
