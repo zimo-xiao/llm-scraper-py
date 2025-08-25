@@ -168,7 +168,6 @@ class OpenAIModel:
         top_p: Optional[float] = None,
         mode: Optional[str] = None,
     ) -> Dict[str, Any]:
-        print(messages)
         client_settings = {
             "model": self._model,
             "input": messages,

@@ -18,12 +18,23 @@ from .models import (
     agenerate_llm_code,
     agenerate_llm_object,
 )
+from .util import dict_to_model_type
 
 T = TypeVar("T")
 
 SchemaType = Union[
     Type[BaseModel], Dict[str, Any]
 ]  # Pydantic model class or JSON Schema dict
+
+
+class RunOutput(BaseModel):
+    data: Optional[Dict[str, Any] | BaseModel]
+    url: str
+
+
+class CodeOutput(BaseModel):
+    code: str
+    url: str
 
 
 class LLMScraper(Generic[T]):
@@ -41,6 +52,7 @@ class LLMScraper(Generic[T]):
         options: Optional[
             ScraperLLMOptions | PreProcessOptions | Dict[str, Any]
         ] = None,
+        match_schema_type: bool = False,
     ) -> Dict[str, Any]:
         """
         Pre-process the page and get a structured JSON object back.
@@ -49,7 +61,8 @@ class LLMScraper(Generic[T]):
         opts = {} if options is None else dict(options)  # shallow copy
         pre: PreProcessResult = await apreprocess(page, opts or {"format": "html"})
         obj = await agenerate_llm_object(self.client, pre, schema, opts)
-        return {"data": obj, "url": pre.url}
+        obj = dict_to_model_type(obj, schema) if match_schema_type else obj
+        return RunOutput(data=obj, url=pre.url)
 
     def run(
         self,
@@ -58,6 +71,7 @@ class LLMScraper(Generic[T]):
         options: Optional[
             ScraperLLMOptions | PreProcessOptions | Dict[str, Any]
         ] = None,
+        match_schema_type: bool = False,
     ) -> Dict[str, Any]:
         """
         Pre-process the page and get a structured JSON object back.
@@ -66,7 +80,8 @@ class LLMScraper(Generic[T]):
         opts = {} if options is None else dict(options)  # shallow copy
         pre: PreProcessResult = preprocess(page, opts or {"format": "html"})
         obj = generate_llm_object(self.client, pre, schema, opts)
-        return {"data": obj, "url": pre.url}
+        obj = dict_to_model_type(obj, schema) if match_schema_type else obj
+        return RunOutput(data=obj, url=pre.url)
 
     async def astream(
         self,
@@ -113,7 +128,7 @@ class LLMScraper(Generic[T]):
         opts = {} if options is None else dict(options)
         pre: PreProcessResult = await apreprocess(page, opts or {"format": "html"})
         code = await agenerate_llm_code(self.client, pre, schema, opts)
-        return {"code": code, "url": pre.url}
+        return CodeOutput(code=code, url=pre.url)
 
     def generate(
         self,
@@ -128,4 +143,4 @@ class LLMScraper(Generic[T]):
         opts = {} if options is None else dict(options)
         pre: PreProcessResult = preprocess(page, opts or {"format": "html"})
         code = generate_llm_code(self.client, pre, schema, opts)
-        return {"code": code, "url": pre.url}
+        return CodeOutput(code=code, url=pre.url)

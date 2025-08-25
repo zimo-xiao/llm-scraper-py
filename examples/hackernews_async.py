@@ -37,7 +37,7 @@ async def main():
 
         # Show results
         print("Top Stories:")
-        for story in result["data"]["top"]:
+        for story in result.data["top"]:
             print(f"- {story['title']} ({story['points']} points by {story['by']})")
 
         await browser.close()

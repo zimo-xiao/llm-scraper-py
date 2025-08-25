@@ -104,7 +104,7 @@ async def main():
 
         # Display results
         print("Top Stories:")
-        for story in result["data"]["top"]:
+        for story in result.data["top"]:
             print(f"- {story['title']} ({story['points']} points by {story['by']})")
 
         await browser.close()
@@ -237,11 +237,11 @@ class ProductInfo(BaseModel):
 
 # Generate extraction code (async)
 result = await scraper.agenerate(page, ProductInfo)
-generated_code = result["code"]
+generated_code = result.code
 
 # Or synchronous
 result = scraper.generate(page, ProductInfo)
-generated_code = result["code"]
+generated_code = result.code
 
 # Execute the generated code on any similar page
 extracted_data = await page.evaluate(generated_code)

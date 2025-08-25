@@ -33,7 +33,7 @@ async def main():
 
         # Ask the LLM to generate a JS IIFE that extracts data per schema
         gen = await scraper.agenerate(page, HNTop5, {"format": "raw_html"})
-        code = gen["code"]
+        code = gen.code
         print("Generated code:\n", code, "\n")
 
         # Execute the generated code in the page context
